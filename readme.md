@@ -17,8 +17,8 @@ Addtionally all accesses are limited with a TTL by default.
 
 - [x] Setup Vault Server
 - [x] Configure Vault to create DB User
-- [ ] Call API to consume the requested resources
-- [x] Configure Vault to create User Account (Linux)
+- [x] Call API to consume the requested resources
+- [ ] Configure Vault to create User Account (Linux)
 
 ### Additional
 
