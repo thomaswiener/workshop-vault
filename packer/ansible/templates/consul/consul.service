@@ -1,0 +1,11 @@
+[Unit]
+Description=Consul
+Documentation=https://www.consul.io/
+
+[Service]
+ExecStart=/usr/bin/consul agent -server -ui -bind 127.0.0.1 -config-dir /etc/consul.d -data-dir /temp/consul -node vault -bootstrap-expect 1
+ExecReload=/bin/kill –HUP $MAINPID
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

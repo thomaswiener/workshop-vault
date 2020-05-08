@@ -1,0 +1,18 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "eu-central-1",
+      "instance_type": "t2.micro",
+      "source_ami": "ami-0b6d8a6db0c665fb7",
+      "ssh_username": "ubuntu",
+      "ami_name": "ubuntu-18-04-vault-fff",
+      "subnet_id": "subnet-00fd1f36753f05c54",
+      "associate_public_ip_address": "true"
+    }
+  ],
+  "provisioners": [{
+    "type": "ansible",
+    "playbook_file": "../ansible/playbooks/vault.yaml"
+  }]
+}

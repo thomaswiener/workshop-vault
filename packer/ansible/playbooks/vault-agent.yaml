@@ -1,0 +1,58 @@
+---
+- name: "include global vars"
+  hosts: all
+  become: yes
+  tasks:
+#    - include_vars:
+#        file: "{{env}}.yaml"
+
+- name: setup default
+  hosts: all
+  become: yes
+  tasks:
+    - name: 'install deps'
+      apt:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - apt-transport-https
+          - lsb-release
+          - ca-certificates
+          - wget
+          - curl
+          - make
+          - telnet
+          - unzip
+          - vim
+          - zip
+          - htop
+
+- name: install vault-agent
+  hosts: all
+  become: yes
+  tasks:
+    - name: 'vault: download'
+      unarchive:
+        src: https://releases.hashicorp.com/vault-ssh-helper/0.1.4/vault-ssh-helper_0.1.4_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        mode: '0755'
+        owner: root
+    - name: 'vault: ensure system folder'
+      file:
+        path: '/etc/vault-ssh-helper.d'
+        state: directory
+    - name: 'vault: create config.hcl'
+      template:
+        src: "../templates/vault-agent/config.hcl"
+        dest: "/etc/vault-ssh-helper.d/config.hcl"
+    - name: 'vault: pam_sshd'
+      template:
+        src: "../templates/vault-agent/ssh/pam_sshd"
+        dest: "/etc/pam.d/sshd"
+    - name: 'vault: ssh_config'
+      template:
+        src: "../templates/vault-agent/ssh/ssh_config"
+        dest: "/etc/ssh/ssh_config"
+

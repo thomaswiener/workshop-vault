@@ -1,0 +1,91 @@
+---
+- name: "include global vars"
+  hosts: all
+  become: yes
+  tasks:
+#    - include_vars:
+#        file: "{{env}}.yaml"
+
+- name: setup default
+  hosts: all
+  become: yes
+  tasks:
+    - name: 'install deps'
+      apt:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - apt-transport-https
+          - lsb-release
+          - ca-certificates
+          - wget
+          - curl
+          - make
+          - telnet
+          - unzip
+          - vim
+          - zip
+          - htop
+
+- name: install consul
+  hosts: all
+  become: yes
+  tasks:
+    - name: 'consul: download'
+      unarchive:
+        src: https://releases.hashicorp.com/consul/1.7.2/consul_1.7.2_linux_amd64.zip
+        dest: /usr/bin
+        remote_src: yes
+    - name: 'consul: create consul.service'
+      template:
+        src: "../templates/consul/consul.service"
+        dest: "/etc/systemd/system/consul.service"
+    - name: 'consul: ensure consul.d folder'
+      file:
+        path: '/etc/consul.d'
+        state: directory
+    - name: 'consul: create ui.json'
+      template:
+        src: "../templates/consul/ui.json"
+        dest: "/etc/consul.d/consul.service"
+    - name: 'daemon reload'
+      systemd:
+        daemon_reload: yes
+    - name: 'consul: start'
+      systemd:
+        enabled: yes
+        state: started
+        name: consul
+
+
+
+- name: install vault
+  hosts: all
+  become: yes
+  tasks:
+    - name: 'vault: download'
+      unarchive:
+        src: https://releases.hashicorp.com/vault/1.4.1/vault_1.4.1_linux_amd64.zip
+        dest: /usr/bin
+        remote_src: yes
+    - name: 'vault: ensure system folder'
+      file:
+        path: '/etc/vault'
+        state: directory
+    - name: 'vault: create config.hcl'
+      template:
+        src: "../templates/vault/config.hcl"
+        dest: "/etc/vault/config.hcl"
+    - name: 'vault: create vault.service'
+      template:
+        src: "../templates/vault/vault.service"
+        dest: "/etc/systemd/system/vault.service"
+    - name: 'daemon reload'
+      systemd:
+        daemon_reload: yes
+    - name: 'vault: start'
+      systemd:
+        enabled: yes
+        state: started
+        name: vault
